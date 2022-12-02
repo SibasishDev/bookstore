@@ -27,6 +27,8 @@ class customerController {
             return res.status(200).json({
                 status: 200,
                 message: "customer created successfully",
+                cId : insertCustomer.insertId
+
             });
 
         } catch (e) {
@@ -52,7 +54,7 @@ class customerController {
 
             return res.status(200).json({
                 status: 200,
-                message: "seller update successfully",
+                message: "customer update successfully",
             });
 
         } catch (e) {
@@ -79,24 +81,24 @@ class customerController {
         }
     }
 
-    async getCustomer(req,res,next){
-        try{
-            const {cid} = req.body;
+    async getCustomer(req, res, next) {
+        try {
+            const { cid } = req.body;
 
-            if(!cid) throw createError.BadRequest('customer id required');
+            if (!cid) throw createError.BadRequest('customer id required');
 
             const query = `select id,name from customers where id = ${cid}`;
 
-            let [data] = await customerModal.customerDbOpreation(query);
+            let data = await customerModal.customerDbOpreation(query);
 
-            if (!data) throw createError.NotFound('customer not found in db');
+            if (!data.length) throw createError.NotFound('customer not found in db');
 
             return res.status(200).json({
                 code: 200,
                 data: data
             });
 
-        }catch(e){
+        } catch (e) {
             next(e);
         }
     }
@@ -110,21 +112,18 @@ class customerController {
 
             let query1 = `select id from customers where id = ${cid}`;
 
-            let isCustomerExist = await customerModal.customerDbOpreation(query1);
+            let [isCustomerExist] = await customerModal.customerDbOpreation(query1);
 
-            if (!isCustomerExist.length) throw createError.BadRequest('customer not found');
+            if (!isCustomerExist) throw createError.BadRequest('customer not found');
 
             let query2 = `DELETE from customers where id = ${cid}`;
 
             let deleteCustomer = await customerModal.customerDbOpreation(query2);
 
-
-            if (deleteCustomer.affectedRows == 1) return res.status(200).json({
+            return res.status(200).json({
                 code: 200,
                 message: "customer deleted successfully"
             });
-
-            throw createError.BadRequest("Something went wrong.");
 
         } catch (e) {
             next(e);

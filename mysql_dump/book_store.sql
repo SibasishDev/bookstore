@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 01, 2022 at 09:17 PM
+-- Generation Time: Dec 02, 2022 at 07:02 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -38,12 +38,8 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id`, `bookName`, `sid`) VALUES
-(1, 'haary potor', 1),
-(2, 'Angular', 2),
-(3, 'freedom', 3),
-(10, 'rich dad poor dad', 2),
-(11, 'better than bestfriend', 1),
-(14, 'undefined', 1);
+(19, 'harry potor', 8),
+(20, 'best friend better friend', 8);
 
 -- --------------------------------------------------------
 
@@ -81,10 +77,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `cid`, `bid`) VALUES
-(5, 3, 1),
-(6, 3, 2),
-(8, 4, 3),
-(9, 3, 11);
+(19, 3, 20),
+(20, 3, 19);
 
 -- --------------------------------------------------------
 
@@ -102,9 +96,9 @@ CREATE TABLE `sellers` (
 --
 
 INSERT INTO `sellers` (`id`, `name`) VALUES
-(1, 'Lucky'),
 (2, 'Sibasish'),
-(3, 'Saurav Vishal');
+(8, 'Lucky'),
+(9, 'Saurav');
 
 --
 -- Indexes for dumped tables
@@ -145,25 +139,25 @@ ALTER TABLE `sellers`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `sellers`
 --
 ALTER TABLE `sellers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
@@ -179,8 +173,8 @@ ALTER TABLE `books`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `customers` (`id`),
-  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`bid`) REFERENCES `books` (`id`);
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`bid`) REFERENCES `books` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

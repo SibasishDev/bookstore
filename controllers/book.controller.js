@@ -20,6 +20,7 @@ class bookController {
             res.status(200).json({
                 status: 200,
                 message: "book insert succeefully",
+                bookId : insertBook.insertId
             });
 
 
@@ -62,7 +63,7 @@ class bookController {
 
             let bookData = await bookModal.bookDbOpreation(query);
 
-            if (!bookData) throw createError.NotFound('no book found in db');
+            if (!bookData.length) throw createError.NotFound('no book found in db');
 
             return res.status(200).json({
                 code: 200,
@@ -86,6 +87,8 @@ class bookController {
 
             let insertOrder = await bookModal.bookDbOpreation(query);
 
+            console.log(insertOrder);
+
             if (!insertOrder) throw createError.BadRequest("Something went wrong.");
 
             return res.status(200).json({
@@ -107,6 +110,8 @@ class bookController {
 
             let purchaseBookData = await bookModal.bookDbOpreation(query);
 
+            if(!purchaseBookData.length) throw createError.NotFound('no data found');
+
             return res.status(200).json({
                 code: 200,
                 data: purchaseBookData
@@ -120,10 +125,12 @@ class bookController {
     async bookSoldBySeller(req, res, next) {
         try {
 
-            const query = `SELECT s.id,b.id,s.name AS seller_name,b.bookName AS book_name
+            const query = `SELECT s.id as sid,b.id as bid,s.name AS seller_name,b.bookName AS book_name
                            FROM sellers s INNER JOIN books b ON s.id = b.sid`;
 
             let sellerData = await bookModal.bookDbOpreation(query);
+
+            if(!sellerData.length) throw createError.NotFound('no data found');
 
             return res.status(200).json({
                 code: 200,
@@ -142,10 +149,40 @@ class bookController {
 
             let bookData = await bookModal.bookDbOpreation(query);
 
+            if(!bookData.length) throw createError.NotFound('no data found');
+
             return res.status(200).json({
                 code: 200,
                 data: bookData
             })
+
+        }catch(e){
+            next(e);
+        }
+    }
+
+    async deleteBook(req,res,next){
+        try{
+
+            const {bid} = req.body;
+
+            if(!bid) throw createError.BadRequest('book id required');
+
+            let query1 = `SELECT id from books where id = ${bid}`;
+
+            let [isBookExist] = await bookModal.bookDbOpreation(query1);
+
+            if(!isBookExist) throw createError.NotFound('book id not exist');
+
+            let query2 = `DELETE from books where id = ${bid}`;
+
+            let deleteBook = await bookModal.bookDbOpreation(query2);
+
+            return res.status(200).json({
+                code : 200,
+                message : "Book deleted successfully"
+            })
+
 
         }catch(e){
             next(e);

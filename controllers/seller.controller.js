@@ -27,6 +27,7 @@ class sellerController {
             return res.status(200).json({
                 status: 200,
                 message: "seller created successfully",
+                sId : insertSeller.insertId
             });
 
         } catch (e) {
@@ -81,24 +82,24 @@ class sellerController {
         }
     }
 
-    async getSeller(req,res,next){
-        try{
-            const {sid} = req.body;
+    async getSeller(req, res, next) {
+        try {
+            const { sid } = req.body;
 
-            if(!sid) throw createError.BadRequest('seller id required');
+            if (!sid) throw createError.BadRequest('seller id required');
 
             const query = `select id,name from sellers where id = ${sid}`;
 
-            let [data] = await sellerModal.sellerDbOpreation(query);
+            let data = await sellerModal.sellerDbOpreation(query);
 
-            if (!data) throw createError.NotFound('seller not found in db');
+            if (!data.length) throw createError.NotFound('seller not found in db');
 
             return res.status(200).json({
                 code: 200,
                 data: data
             });
 
-        }catch(e){
+        } catch (e) {
             next(e);
         }
     }
@@ -112,22 +113,18 @@ class sellerController {
 
             let query1 = `select id from sellers where id = ${sid}`;
 
-            let isSellerExist = await sellerModal.sellerDbOpreation(query1);
-            console.log(isSellerExist);
+            let [isSellerExist] = await sellerModal.sellerDbOpreation(query1);
 
-            if (!isSellerExist.length) throw createError.BadRequest('seller not found');
+            if (!isSellerExist) throw createError.BadRequest('seller not found');
 
             let query2 = `DELETE from sellers where id = ${sid}`;
 
             let deleteSeller = await sellerModal.sellerDbOpreation(query2);
-            console.log(deleteSeller);
 
-            if (deleteSeller.affectedRows == 1) return res.status(200).json({
+            return res.status(200).json({
                 code: 200,
                 message: "seller deleted successfully"
             });
-
-            throw createError.BadRequest("Something went wrong.");
 
         } catch (e) {
             next(e);
