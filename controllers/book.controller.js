@@ -20,9 +20,8 @@ class bookController {
             res.status(200).json({
                 status: 200,
                 message: "book insert succeefully",
-                bookId : insertBook.insertId
+                bookId: insertBook.insertId
             });
-
 
         } catch (e) {
             next(e);
@@ -59,16 +58,26 @@ class bookController {
     async getAllBook(req, res, next) {
         try {
 
-            const query = `select id,bookName from books`;
+            const query = `SELECT 
+            b.id, b.bookName,b.price,d.discount,d.type, 
+            case 
+                WHEN d.type = 'percentage' 
+                THEN round(b.price * (100 - d.discount)/100)
+                WHEN d.type = 'amount'
+                THEN round(b.price - d.discount) 
+            END  as discount_price
+        from books b inner join discount d on b.id = d.bId;`;
 
             let bookData = await bookModal.bookDbOpreation(query);
 
             if (!bookData.length) throw createError.NotFound('no book found in db');
 
+            // discountPrice,discounttype,discountvalue
+
+
             return res.status(200).json({
                 code: 200,
                 data: bookData
-
             });
 
         } catch (e) {
@@ -110,7 +119,7 @@ class bookController {
 
             let purchaseBookData = await bookModal.bookDbOpreation(query);
 
-            if(!purchaseBookData.length) throw createError.NotFound('no data found');
+            if (!purchaseBookData.length) throw createError.NotFound('no data found');
 
             return res.status(200).json({
                 code: 200,
@@ -130,7 +139,7 @@ class bookController {
 
             let sellerData = await bookModal.bookDbOpreation(query);
 
-            if(!sellerData.length) throw createError.NotFound('no data found');
+            if (!sellerData.length) throw createError.NotFound('no data found');
 
             return res.status(200).json({
                 code: 200,
@@ -142,52 +151,78 @@ class bookController {
         }
     }
 
-    async getSoldBook(req,res,next){
-        try{
+    async getSoldBook(req, res, next) {
+        try {
 
             const query = `SELECT o.bid, b.bookName FROM orders o INNER JOIN books b ON o.bid = b.id group BY b.id`;
 
             let bookData = await bookModal.bookDbOpreation(query);
 
-            if(!bookData.length) throw createError.NotFound('no data found');
+            if (!bookData.length) throw createError.NotFound('no data found');
 
             return res.status(200).json({
                 code: 200,
                 data: bookData
             })
 
-        }catch(e){
+        } catch (e) {
             next(e);
         }
     }
 
-    async deleteBook(req,res,next){
-        try{
+    async deleteBook(req, res, next) {
+        try {
 
-            const {bid} = req.body;
+            const { bid } = req.body;
 
-            if(!bid) throw createError.BadRequest('book id required');
+            if (!bid) throw createError.BadRequest('book id required');
 
             let query1 = `SELECT id from books where id = ${bid}`;
 
             let [isBookExist] = await bookModal.bookDbOpreation(query1);
 
-            if(!isBookExist) throw createError.NotFound('book id not exist');
+            if (!isBookExist) throw createError.NotFound('book id not exist');
 
             let query2 = `DELETE from books where id = ${bid}`;
 
             let deleteBook = await bookModal.bookDbOpreation(query2);
 
             return res.status(200).json({
-                code : 200,
-                message : "Book deleted successfully"
+                code: 200,
+                message: "Book deleted successfully"
             })
 
 
-        }catch(e){
+        } catch (e) {
             next(e);
         }
     }
+
+    async filterData(req, res, next) {
+        try {
+
+            const { word } = req.body;
+            if (!word) throw createError.BadRequest('search keyword requird');
+
+            const query = `SELECT * from books where bookName LIKE  '%${word}%' OR authorName LIKE '%${word}%'`;
+            
+            let filterData = await bookModal.bookDbOpreation(query);
+
+            if (!filterData.length) throw createError.NotFound('no data found');
+
+            return res.status(200).json({
+                code: 200,
+                data: filterData
+            })
+
+
+        } catch (e) {
+            console.log(e.message);
+            next(e);
+        }
+    }
+
+
 }
 
 module.exports = new bookController();
