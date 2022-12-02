@@ -43,7 +43,6 @@ app.use((req, res, next) => {
  * error handler
  */
 app.use((err, req, res, next) => {
-    console.log(err);
     return res.status(err.status || 500).json({
         error: {
             status: err.status || 500,

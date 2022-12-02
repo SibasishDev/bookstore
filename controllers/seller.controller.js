@@ -3,14 +3,7 @@ const createError = require('http-errors');
 const sellerModal = require('../modal/seller.modal');
 
 class sellerController {
-    /**
-   * insertseller - 
-   * @param {*} res 
-   * @param {*} next 
-   * @returns 
-   * @author Sibasish Das
-   */
-
+  
     async insertSeller(req, res, next) {
         try {
 
